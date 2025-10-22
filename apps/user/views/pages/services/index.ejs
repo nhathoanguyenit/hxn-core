@@ -1,0 +1,91 @@
+<div class="container py-5" style="min-height: 100vh">
+    <h1 class="text-center mb-3">Our Services</h1>
+
+    <div class="row g-4 justify-content-center">
+        <!-- Message Digest -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <a href="/services/message-digest" class="text-decoration-none">
+                <div class="card bg-primary text-light border-0 shadow-lg h-100 service-card">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 mb-3">🔐</div>
+                        <h4 class="card-title mb-3">Message Digest</h4>
+                        <p class="card-text text-secondary">
+                            Generate secure hashes (MD5, SHA-1, SHA-256, SHA-512) from text or files.
+                        </p>
+                    </div>
+                    <div class="card-footer text-center bg-transparent border-0 pb-4">
+                        <span class="btn btn-outline-light btn-sm px-3">Explore →</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Encryption -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <a href="/services/encryption" class="text-decoration-none">
+                <div class="card bg-primary text-light border-0 shadow-lg h-100 service-card">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 mb-3">🧩</div>
+                        <h4 class="card-title mb-3">Encryption</h4>
+                        <p class="card-text text-secondary">
+                            Encrypt and decrypt messages using AES, DES, and custom keys securely.
+                        </p>
+                    </div>
+                    <div class="card-footer text-center bg-transparent border-0 pb-4">
+                        <span class="btn btn-outline-light btn-sm px-3">Explore →</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Converter -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <a href="/services/converter" class="text-decoration-none">
+                <div class="card bg-primary text-light border-0 shadow-lg h-100 service-card">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 mb-3">🔄</div>
+                        <h4 class="card-title mb-3">Converter</h4>
+                        <p class="card-text text-secondary">
+                            Convert images and videos.
+                        </p>
+                    </div>
+                    <div class="card-footer text-center bg-transparent border-0 pb-4">
+                        <span class="btn btn-outline-light btn-sm px-3">Explore →</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .service-card {
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            background 0.25s ease;
+        border-radius: 1rem;
+    }
+
+    .service-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
+        background: #2b2b2b;
+    }
+
+    .service-card .card-footer .btn {
+        border-radius: 50px;
+        transition:
+            background 0.3s ease,
+            color 0.3s ease;
+    }
+
+    .service-card:hover .btn {
+        background: white;
+        color: black;
+    }
+
+    h1 {
+        font-weight: 700;
+    }
+</style>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" /> -->
+        <title><%= title %></title>
+
+        <link rel="stylesheet" href="/plugins/bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/assets/css/theme.css" />
+        <link rel="stylesheet" href="/assets/css/style.css" />
+
+        <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/plugins/socket-io-client/socket.io.js"></script>
+        <script src="/plugins/socket-sdk/socket-sdk.js"></script>
+        <script src="/plugins/socket-sdk/socket-chat-with-agent-gui.js"></script>
+    </head>
+
+    <body class="bg-dark text-light">
+        <%- include('header') %> <%- include(page) %> <%- include('footer') %>
+    </body>
+
+    <script>
+        let chatGui = null; 
+        const sdk = new SocketSDK("/", {});
+        const pingDisplay = document.getElementById("ping");
+
+        function updatePingColor(latency) {
+            if (latency < 80) pingDisplay.style.color = "#00FF00";
+            else if (latency < 150) pingDisplay.style.color = "#FFD700";
+            else pingDisplay.style.color = "#FF4500";
+        }
+
+        sdk.connect()
+        .then(async () => {
+            console.log("✅ Connected to App Gateway");
+
+            sdk.on("authenticated", (data) => {
+                console.log("👤 Authenticated as:", data.user);
+                initChat(data.user);
+            });
+
+            const ack = await sdk.emit("authenticate", {}, 5000, "");
+            if (!ack?.ok) {
+                console.error("❌ Authentication failed:", ack?.message);
+                return;
+            }
+
+            // const pingLoop = async () => {
+            //     const start = Date.now();
+            //     try {
+            //         const data = await sdk.emit("ping", { clientTime: start }, 5000, "pong");
+            //         const latency = Date.now() - start;
+            //         updatePingColor(latency);
+            //         pingDisplay.textContent = `${latency} ms`;
+            //     } catch {
+            //         pingDisplay.textContent = `999 ms`;
+            //         pingDisplay.style.color = "#FF0000";
+            //     }
+            // };
+            // setInterval(pingLoop, 1000);
+        })
+        .catch((err) => {
+            console.error("❌ Socket connection failed:", err);
+            updatePingColor(999);
+            pingDisplay.textContent = `999 ms`;
+        });
+
+        function initChat(user) {
+            if (typeof SocketChatGUI === "undefined") {
+                console.error("❌ socket-chat-with-agent-gui.js not loaded!");
+                return;
+            }
+
+            if (chatGui) {
+                console.log("ℹ️ Chat GUI already initialized.");
+                return;
+            }
+
+            chatGui = new SocketChatGUI({
+                username: user.name,
+                room: "general",
+                namespace: "/chat",
+                withCredentials: true
+            });
+            
+            console.log(`💬 Chat initialized for: ${user.name}`);
+        }
+    </script>
+</html>

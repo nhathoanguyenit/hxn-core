@@ -1,0 +1,192 @@
+<div class="container py-5" style="min-height: 100vh">
+    <h1 class="text-center mb-4">Converter</h1>
+    <p class="text-center text-light mb-5">Optimize and convert images or videos easily.</p>
+
+    <!-- Tabs -->
+    <div
+        class="d-flex rounded-top justify-content-center"
+        style="height: 45px; background: color-mix(in srgb, rgb(var(--bs-primary-rgb)), black 25%)"
+        id="converterTabs"
+        role="tablist"
+    >
+        <div class="d-flex w-100 justify-content-center">
+            <button
+                class="nav-link active tab-btn w-100"
+                id="image-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#image"
+                type="button"
+                role="tab"
+            >
+                🖼️ Image
+            </button>
+        </div>
+        <div class="d-flex w-100 justify-content-center">
+            <button
+                class="nav-link tab-btn w-100"
+                id="video-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#video"
+                type="button"
+                role="tab"
+            >
+                🎥 Video
+            </button>
+        </div>
+    </div>
+
+    <div class="tab-content rounded-bottom bg-primary text-light p-4 shadow-lg">
+        <!-- IMAGE TAB -->
+        <div class="tab-pane fade show active" id="image" role="tabpanel">
+            <h4 class="mb-3">Image Converter</h4>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6 for="imageInput" class="form-label small text-light">Select Image</h6>
+                    <input type="file" id="imageInput" class="form-control custom-input" accept="image/*" />
+                    <div id="imagePreview" class="mt-3 text-center"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <h6 class="form-label small text-light">Options</h6>
+                    <div class="p-4 mb-3" style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px;">
+                        <div class="mb-3">
+                            <label for="resizeWidth" class="form-label small">Resize Width (px)</label>
+                            <input
+                                type="number"
+                                id="resizeWidth"
+                                class="form-control custom-input"
+                                placeholder="e.g. 800"
+                            />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="resizeHeight" class="form-label small">Resize Height (px)</label>
+                            <input
+                                type="number"
+                                id="resizeHeight"
+                                class="form-control custom-input"
+                                placeholder="auto"
+                            />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imageFormat" class="form-label small">Output Format</label>
+                            <select id="imageFormat" class="form-select custom-input">
+                                <option value="image/jpeg">JPEG</option>
+                                <option value="image/png">PNG</option>
+                                <option value="image/webp">WebP</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imageQuality" class="form-label small">Quality (0–1)</label>
+                            <input
+                                type="number"
+                                id="imageQuality"
+                                min="0"
+                                max="1"
+                                step="0.1"
+                                value="0.8"
+                                class="form-control custom-input"
+                            />
+                        </div>
+
+                        <button class="btn btn-outline-light w-100" id="convertImageBtn">Convert Image</button>
+                    </div>
+
+                    <div id="imageOutputContainer" class="text-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIDEO TAB -->
+        <div class="tab-pane fade" id="video" role="tabpanel">
+            <h4 class="mb-3">Video Converter</h4>
+
+            <p class="text-light small">
+                Basic video compression or format conversion (client-side limited). For full conversion, use server
+                tools like FFmpeg.
+            </p>
+
+            <input type="file" id="videoInput" class="form-control custom-input mb-3" accept="video/*" />
+
+            <video id="videoPreview" controls class="w-100 mb-3" style="max-height: 300px; background: #111"></video>
+
+            <div class="bg-primary text-light p-4 mb-3" style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px;">
+                <label for="videoFormat" class="form-label small">Target Format</label>
+                <select id="videoFormat" class="form-select custom-input">
+                    <option value="mp4">MP4</option>
+                    <option value="webm">WebM</option>
+                </select>
+
+                <button class="btn btn-outline-light w-100 my-2" id="convertVideoBtn">Convert (Preview Only)</button>
+            </div>
+
+            <div id="videoOutputContainer" class="text-center"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const imgInput = document.getElementById("imageInput");
+        const imgPreview = document.getElementById("imagePreview");
+        const imgOut = document.getElementById("imageOutputContainer");
+
+        imgInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                imgPreview.innerHTML = `<img src="${ev.target.result}" class="img-fluid rounded shadow" style="max-height:300px;">`;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById("convertImageBtn").addEventListener("click", async () => {
+            const file = imgInput.files[0];
+            if (!file) return alert("Please select an image.");
+
+            const width = parseInt(document.getElementById("resizeWidth").value) || null;
+            const height = parseInt(document.getElementById("resizeHeight").value) || null;
+            const format = document.getElementById("imageFormat").value;
+            const quality = parseFloat(document.getElementById("imageQuality").value) || 0.8;
+
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            await img.decode();
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width || img.width;
+            canvas.height = height || img.height;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const blob = await new Promise((res) => canvas.toBlob(res, format, quality));
+            const url = URL.createObjectURL(blob);
+
+            imgOut.innerHTML = `
+        <div class="mt-3">
+          <h6>Converted Image:</h6>
+          <img src="${url}" class="img-fluid rounded border shadow mb-2" style="max-height:300px;">
+          <a href="${url}" download="converted.${format.split("/")[1]}" class="btn btn-sm btn-outline-light">Download</a>
+        </div>`;
+        });
+
+        // Video tab preview only
+        const vidInput = document.getElementById("videoInput");
+        const vidPrev = document.getElementById("videoPreview");
+
+        vidInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            vidPrev.src = URL.createObjectURL(file);
+        });
+
+        document.getElementById("convertVideoBtn").addEventListener("click", () => {
+            alert("Client-side video conversion is limited. Use FFmpeg for full conversion.");
+        });
+    });
+</script>
